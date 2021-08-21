@@ -3,11 +3,14 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 	"sync"
 
 	"net/http"
 	"path/filepath"
 	"text/template"
+
+	"github.com/tokutoku15/go-practice/chap1/trace"
 )
 
 // temp1は1つのテンプレートを表す
@@ -30,6 +33,7 @@ func main() {
 	var addr = flag.String("addr", ":8080", "アプリケーションのアドレス")
 	flag.Parse()
 	r := newRoom()
+	r.tracer = trace.New(os.Stdout)
 	//ルート
 	http.Handle("/", &templateHandler{filename: "chat.html"})
 	http.Handle("/room", r)
