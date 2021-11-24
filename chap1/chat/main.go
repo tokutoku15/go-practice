@@ -17,6 +17,13 @@ import (
 	"github.com/tokutoku15/go-practice/chap1/trace"
 )
 
+// 現在アクティブなAvatarの実装
+var avatars Avatar = TryAvatars{
+	UseFileSystemAvatar,
+	UseAuthAvatar,
+	UseGravatar,
+}
+
 // temp1は1つのテンプレートを表す
 type templateHandler struct {
 	once     sync.Once
@@ -65,6 +72,9 @@ func main() {
 		w.Header()["Location"] = []string{"/chat"}
 		w.WriteHeader(http.StatusTemporaryRedirect)
 	})
+	http.Handle("/upload", &templateHandler{filename: "upload.html"})
+	http.HandleFunc("/uploader", uploaderHandler)
+	http.Handle("/avatars/", http.StripPrefix("/avatars/", http.FileServer(http.Dir("./avatars"))))
 	//チャットルームを開始
 	go r.run()
 	//Webサーバーの開始
